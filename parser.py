@@ -1,9 +1,19 @@
 
 import argparse
+import os
+
+
+def append_sm_args(args):
+    args.train_dataset_folder = os.environ.get("SM_CHANNEL_TRAIN", args.train_dataset_folder)
+    args.val_dataset_folder = os.environ.get("SM_CHANNEL_VALIDATION", args.val_dataset_folder)
+    args.test_dataset_folder = os.environ.get("SM_CHANNEL_TEST", args.test_dataset_folder)
+    args.save_dir = os.environ.get("SM_MODEL_DIR", args.save_dir)
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--run_on_sm", type=bool, default=False,
+                        help="Is this job running on sagemaker")
     # CosPlace Groups parameters
     parser.add_argument("--M", type=int, default=15, help="_")
     parser.add_argument("--N", type=int, default=3, help="_")
@@ -62,8 +72,9 @@ def parse_arguments():
     parser.add_argument("--save_dir", type=str, default="default",
                         help="name of directory on which to save the logs, under logs/save_dir")
     
-    args = parser.parse_args()
+    args,  = parser.parse_args()
     if args.groups_num == 0:
         args.groups_num = args.N * args.N
-    
+    if args.run_on_sm:
+        args = append_sm_args(args)
     return args

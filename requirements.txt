@@ -13,3 +13,6 @@ torchvision>=0.15.2
 tqdm>=4.65.0
 urllib3>=2.0.3
 utm>=0.7.0
+opencv-python
+faiss-cpu
+
