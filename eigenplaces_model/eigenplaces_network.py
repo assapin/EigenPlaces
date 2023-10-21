@@ -29,13 +29,19 @@ class GeoLocalizationNet_(nn.Module):
         super().__init__()
         assert backbone in CHANNELS_NUM_IN_LAST_CONV, f"backbone must be one of {list(CHANNELS_NUM_IN_LAST_CONV.keys())}"
         self.backbone, features_dim = _get_backbone(backbone)
-        self.aggregation = nn.Sequential(
-            L2Norm(),
-            GeM(),
-            Flatten(),
-            nn.Linear(features_dim, fc_output_dim),
-            L2Norm()
-        )
+        if backbone.startswith("dino"):
+            self.aggregation = nn.Sequential(
+                nn.Linear(features_dim, fc_output_dim),
+                L2Norm()
+            )
+        else:
+            self.aggregation = nn.Sequential(
+                L2Norm(),
+                GeM(),
+                Flatten(),
+                nn.Linear(features_dim, fc_output_dim),
+                L2Norm()
+            )
     
     def forward(self, x):
         x = self.backbone(x)
@@ -48,14 +54,19 @@ def _get_torchvision_model(backbone_name : str) -> torch.nn.Module:
     model from torchvision. Examples of backbone_name are 'VGG16' or 'ResNet18'
     """
     if backbone_name.startswith("dino"):
-        return torch.hub.load('facebookresearch/dinov2', backbone_name)
+         return torch.hub.load('facebookresearch/dinov2', backbone_name)
     return getattr(torchvision.models, backbone_name.lower())()
 
 
 def _get_backbone(backbone_name : str) -> Tuple[torch.nn.Module, int]:
     backbone = _get_torchvision_model(backbone_name)
 
-    if not backbone_name.startswith("dino"):
+    if backbone_name.startswith("dino"):
+        for param in backbone.parameters():
+            param.requires_grad = False
+        logging.debug(f"Using frozen dino v2")
+
+    else:
         logging.info("Loading pretrained backbone's weights from CosPlace")
         cosplace = torch.hub.load("gmberton/cosplace", "get_trained_model", backbone=backbone_name, fc_output_dim=512)
         new_sd = {k1: v2 for (k1, v1), (k2, v2) in zip(backbone.state_dict().items(), cosplace.state_dict().items())
@@ -78,10 +89,6 @@ def _get_backbone(backbone_name : str) -> Tuple[torch.nn.Module, int]:
                     p.requires_grad = False
             logging.debug("Train last layers of the VGG-16, freeze the previous ones")
         backbone = torch.nn.Sequential(*layers)
-    else:
-        for param in backbone.parameters():
-            param.requires_grad = False
-        logging.debug(f"Using frozen dino v2")
 
     features_dim = CHANNELS_NUM_IN_LAST_CONV[backbone_name]
     

@@ -57,9 +57,9 @@ def get_focal_point(utm_coords, meters_from_center=20, angle=0):
 
 
 class EigenPlacesDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset_folder,
+    def __init__(self, dataset_folder, resize=224,
                  M=20, N=5, focal_dist=10, current_group=0, 
-                 min_images_per_class=10, angle=0, visualize_classes=0):
+                 min_images_per_class=10, angle=0, visualize_classes=0, ):
         """
         Parameters (please check our paper for a clearer explanation of the parameters).
         ----------
@@ -92,7 +92,7 @@ class EigenPlacesDataset(torch.utils.data.Dataset):
             self.initialize(dataset_folder, M, N, min_images_per_class, filename)
         elif current_group == 0:
             logging.info(f"Using cached dataset {filename}")
-        
+
         classes_per_group, self.images_per_class = torch.load(filename)
         if current_group >= len(classes_per_group):
             raise ValueError(f"With this configuration there are only {len(classes_per_group)} " +
@@ -147,8 +147,10 @@ class EigenPlacesDataset(torch.utils.data.Dataset):
                 crop = tfm.functional.to_pil_image(crop)
                 crop.save(f"{folder}/{os.path.basename(path)}")
 
+        self.resize = resize
+
     @staticmethod
-    def get_crop(pano_path, focal_point):
+    def get_crop(pano_path, focal_point, resize=None):
         obs_point = pano_path.split("@")[1:3]
         angle = - get_angle(focal_point, obs_point) % 360
         crop_offset = int((angle / 360 * PANO_WIDTH) % PANO_WIDTH)
@@ -165,6 +167,11 @@ class EigenPlacesDataset(torch.utils.data.Dataset):
             pil_crop = Image.new('RGB', (512, 512))
             pil_crop.paste(crop1, (0, 0))
             pil_crop.paste(crop2, (crop1.size[0], 0))
+
+        if resize!=512:
+            from torchvision.transforms import Resize
+            resize = Resize((resize, resize))
+            pil_crop = resize(pil_crop)
         crop = tfm.functional.to_tensor(pil_crop)
         
         return crop
@@ -175,7 +182,7 @@ class EigenPlacesDataset(torch.utils.data.Dataset):
         class_id = self.classes_ids[class_num]
         focal_point = self.focal_point_per_class[class_id]
         pano_path = self.dataset_folder + "/" + random.choice(self.images_per_class[class_id])
-        crop = self.get_crop(pano_path, focal_point)
+        crop = self.get_crop(pano_path, focal_point, self.resize)
         return crop, class_num, pano_path
     
     def get_images_num(self):

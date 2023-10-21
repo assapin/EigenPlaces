@@ -48,7 +48,7 @@ def train():
 
     #### Datasets
     groups = [EigenPlacesDataset(
-        args.train_dataset_folder, M=args.M, N=args.N, focal_dist=args.focal_dist,
+        args.train_dataset_folder, resize = args.image_size_dimension, M=args.M, N=args.N, focal_dist=args.focal_dist,
         current_group=n // 2, min_images_per_class=args.min_images_per_class,
         angle=[0, 90][n % 2], visualize_classes=args.visualize_classes)
         for n in range(args.groups_num * 2)
@@ -64,7 +64,7 @@ def train():
                                                 contrast=args.contrast,
                                                 saturation=args.saturation,
                                                 hue=args.hue),
-        augmentations.DeviceAgnosticRandomResizedCrop([512, 512],
+        augmentations.DeviceAgnosticRandomResizedCrop([args.image_size_dimension, args.image_size_dimension],
                                                       scale=[1 - args.random_resized_crop, 1]),
         tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])

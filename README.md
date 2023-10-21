@@ -46,6 +46,24 @@ import torch
 model = torch.hub.load("gmberton/eigenplaces", "get_trained_model", backbone="ResNet50", fc_output_dim=2048)
 ```
 
+## running with dino
+
+```--epochs_num
+1
+--device
+cpu
+--train_dataset_folder
+/Users/assaf/projects/fingerpic/data/small/train
+--test_dataset_folder
+/Users/assaf/projects/fingerpic/data/small/test
+--val_dataset_folder
+/Users/assaf/projects/fingerpic/data/small/val
+--backbone
+dinov2_vitb14
+--image_size_dimension
+224
+```
+
 
 ## Acknowledgements
 Parts of this repo are inspired by the following repositories:
