@@ -55,28 +55,34 @@ def _get_torchvision_model(backbone_name : str) -> torch.nn.Module:
 def _get_backbone(backbone_name : str) -> Tuple[torch.nn.Module, int]:
     backbone = _get_torchvision_model(backbone_name)
 
-    logging.info("Loading pretrained backbone's weights from CosPlace")
-    cosplace = torch.hub.load("gmberton/cosplace", "get_trained_model", backbone=backbone_name, fc_output_dim=512)
-    new_sd = {k1: v2 for (k1, v1), (k2, v2) in zip(backbone.state_dict().items(), cosplace.state_dict().items())
-              if v1.shape == v2.shape}
-    backbone.load_state_dict(new_sd, strict=False)
+    if not backbone_name.startswith("dino"):
+        logging.info("Loading pretrained backbone's weights from CosPlace")
+        cosplace = torch.hub.load("gmberton/cosplace", "get_trained_model", backbone=backbone_name, fc_output_dim=512)
+        new_sd = {k1: v2 for (k1, v1), (k2, v2) in zip(backbone.state_dict().items(), cosplace.state_dict().items())
+                  if v1.shape == v2.shape}
+        backbone.load_state_dict(new_sd, strict=False)
 
-    if backbone_name.startswith("ResNet"):
-        for name, child in backbone.named_children():
-            if name == "layer3":  # Freeze layers before conv_3
-                break
-            for params in child.parameters():
-                params.requires_grad = False
-        logging.debug(f"Train only layer3 and layer4 of the {backbone_name}, freeze the previous ones")
-        layers = list(backbone.children())[:-2]  # Remove avg pooling and FC layer
-    
-    elif backbone_name == "VGG16":
-        layers = list(backbone.features.children())[:-2]  # Remove avg pooling and FC layer
-        for layer in layers[:-5]:
-            for p in layer.parameters():
-                p.requires_grad = False
-        logging.debug("Train last layers of the VGG-16, freeze the previous ones")
-    
+        if backbone_name.startswith("ResNet"):
+            for name, child in backbone.named_children():
+                if name == "layer3":  # Freeze layers before conv_3
+                    break
+                for params in child.parameters():
+                    params.requires_grad = False
+            logging.debug(f"Train only layer3 and layer4 of the {backbone_name}, freeze the previous ones")
+            layers = list(backbone.children())[:-2]  # Remove avg pooling and FC layer
+
+        elif backbone_name == "VGG16":
+            layers = list(backbone.features.children())[:-2]  # Remove avg pooling and FC layer
+            for layer in layers[:-5]:
+                for p in layer.parameters():
+                    p.requires_grad = False
+            logging.debug("Train last layers of the VGG-16, freeze the previous ones")
+    else:
+        for param in backbone.parameters():
+            param.requires_grad = False
+        logging.debug(f"Using frozen dino v2")
+
+
     backbone = torch.nn.Sequential(*layers)
     
     features_dim = CHANNELS_NUM_IN_LAST_CONV[backbone_name]
