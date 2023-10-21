@@ -6,9 +6,8 @@ import random
 import logging
 import traceback
 import numpy as np
-
-
-class InfiniteDataLoader(torch.utils.data.DataLoader):
+from torch.utils.data import DataLoader
+class InfiniteDataLoader(DataLoader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dataset_iterator = None

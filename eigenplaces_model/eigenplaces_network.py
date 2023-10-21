@@ -14,6 +14,7 @@ CHANNELS_NUM_IN_LAST_CONV = {
     "ResNet101": 2048,
     "ResNet152": 2048,
     "VGG16": 512,
+    'dinov2_vitb14': 768
 }
 
 
@@ -46,6 +47,8 @@ def _get_torchvision_model(backbone_name : str) -> torch.nn.Module:
     """This function takes the name of a backbone and returns the corresponding pretrained
     model from torchvision. Examples of backbone_name are 'VGG16' or 'ResNet18'
     """
+    if backbone_name.startswith("dino"):
+        return torch.hub.load('facebookresearch/dinov2', backbone_name)
     return getattr(torchvision.models, backbone_name.lower())()
 
 
