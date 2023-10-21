@@ -77,14 +77,12 @@ def _get_backbone(backbone_name : str) -> Tuple[torch.nn.Module, int]:
                 for p in layer.parameters():
                     p.requires_grad = False
             logging.debug("Train last layers of the VGG-16, freeze the previous ones")
+        backbone = torch.nn.Sequential(*layers)
     else:
         for param in backbone.parameters():
             param.requires_grad = False
         logging.debug(f"Using frozen dino v2")
 
-
-    backbone = torch.nn.Sequential(*layers)
-    
     features_dim = CHANNELS_NUM_IN_LAST_CONV[backbone_name]
     
     return backbone, features_dim
