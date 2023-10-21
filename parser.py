@@ -72,7 +72,7 @@ def parse_arguments():
     parser.add_argument("--save_dir", type=str, default="default",
                         help="name of directory on which to save the logs, under logs/save_dir")
     
-    args,  = parser.parse_args()
+    args  = parser.parse_args()
     if args.groups_num == 0:
         args.groups_num = args.N * args.N
     if args.run_on_sm:

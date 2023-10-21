@@ -11,12 +11,16 @@ import numpy as np
 class InfiniteDataLoader(torch.utils.data.DataLoader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dataset_iterator = super().__iter__()
+        self.dataset_iterator = None
     
     def __iter__(self):
+        if not self.dataset_iterator:
+            self.dataset_iterator =  super().__iter__()
         return self
     
     def __next__(self):
+        if not self.dataset_iterator:
+            self.dataset_iterator =  super().__iter__()
         try:
             batch = next(self.dataset_iterator)
         except StopIteration:
