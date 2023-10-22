@@ -18,8 +18,11 @@ def save_checkpoint(state: dict, is_best: bool, output_folder: str,
                     ckpt_filename: str = "last_checkpoint.pth"):
     checkpoint_path = f"{output_folder}/{ckpt_filename}"
     torch.save(state, checkpoint_path, )
+    best_model_path = None
     if is_best:
+        best_model_path = f"{output_folder}/best_model.pth"
         torch.save(state["model_state_dict"], f"{output_folder}/best_model.pth")
+    return checkpoint_path, best_model_path
 
 
 def resume_train(args: Namespace, output_folder: str, model: torch.nn.Module,

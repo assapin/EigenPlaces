@@ -20,7 +20,7 @@ For the paper we also released a codebase to reproduce results with all other ba
 Training is performed on the SF-XL dataset, which you can download from [here](https://github.com/gmberton/CosPlace). Make sure to download the training panoramas, which EigenPlaces takes as input and automatically crops with the required orientation.
 After downloading the SF-XL dataset, simply run 
 
-`$ python3 train.py --train_dataset_folder path/to/sf_xl/raw/train/panoramas --val_dataset_folder path/to/sf_xl/processed/val --test_dataset_folder path/to/sf_xl/processed/test`
+`$ python3 train.py --train_dataset_folder path/to/sf_xl/raw/train/panoramas --val_dataset_folder path/to/sf_xl/processed/val --test_dataset_folder path/to/sf_xl/processed/test `
 
 the script automatically splits SF-XL in CosPlace Groups, and saves the resulting object in the folder `cache`.
 By default training is performed with a ResNet-18 with descriptors dimensionality 512 and AMP, which uses less than 8GB of VRAM.
@@ -48,20 +48,17 @@ model = torch.hub.load("gmberton/eigenplaces", "get_trained_model", backbone="Re
 
 ## running with dino
 
-```--epochs_num
-1
---device
-cpu
---train_dataset_folder
-/Users/assaf/projects/fingerpic/data/small/train
---test_dataset_folder
-/Users/assaf/projects/fingerpic/data/small/test
---val_dataset_folder
-/Users/assaf/projects/fingerpic/data/small/val
---backbone
-dinov2_vitb14
---image_size_dimension
-224
+```
+--device cuda \
+--train_dataset_folder /Users/assaf/projects/fingerpic/data/small/train \
+--test_dataset_folder /Users/assaf/projects/fingerpic/data/small/test \
+--val_dataset_folder /Users/assaf/projects/fingerpic/data/small/val \
+--backbone dinov2_vitb14 \
+--image_size_dimension 224 \
+--batch_size 48 \
+--epochs_num 5 \ 
+--iterations_per_epoch 10000 \
+
 ```
 
 

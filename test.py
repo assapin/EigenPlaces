@@ -8,19 +8,28 @@ from typing import Tuple
 from argparse import Namespace
 from torch.utils.data.dataset import Subset
 from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
 
 
 # Compute R@1, R@5, R@10, R@20
 RECALL_VALUES = [1, 5, 10, 20]
 
 
-def test(args: Namespace, eval_ds: Dataset, model: torch.nn.Module, batchify : bool = False) -> Tuple[np.ndarray, str]:
+def test(args: Namespace, eval_ds: Dataset, model: torch.nn.Module, batchify : bool = False, resize=None) -> Tuple[np.ndarray, str]:
     """Compute descriptors of the given dataset and compute the recalls."""
-    
     model = model.eval()
     with torch.no_grad():
-        logging.debug("Extracting database descriptors for evaluation/testing")
         database_subset_ds = Subset(eval_ds, list(range(eval_ds.database_num)))
+        if resize:
+            resize_transform = transforms.Resize((resize, resize))
+            if eval_ds.base_transform is not None:
+                eval_ds.base_transform = transforms.Compose([eval_ds.base_transform, resize_transform])
+            else:
+                eval_ds.base_transform = resize_transform
+
+
+        logging.debug("Extracting database descriptors for evaluation/testing")
+
         database_dataloader = DataLoader(dataset=database_subset_ds, num_workers=args.num_workers,
                                          batch_size=args.infer_batch_size, pin_memory=(args.device == "cuda"))
         all_descriptors = np.empty((len(eval_ds), args.fc_output_dim), dtype="float32")

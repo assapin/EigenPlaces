@@ -17,11 +17,20 @@ import augmentations
 from eigenplaces_model import eigenplaces_network
 from datasets.test_dataset import TestDataset
 from datasets.eigenplaces_dataset import EigenPlacesDataset
+import wandb
+
+def log_model_to_wandb(local_path, name):
+    artifact = wandb.Artifact(name, type='model', description='trained model')
+    artifact.add_file(local_path)
+    wandb.log({name: artifact})
 
 def train():
+
     torch.backends.cudnn.benchmark = True  # Provides a speedup
 
     args = parser.parse_arguments()
+    if args.wandb:
+        wandb.init(project=args.wandb, config=args)
     start_time = datetime.now()
     output_folder = f"logs/{args.save_dir}/{start_time.strftime('%Y-%m-%d_%H-%M-%S')}"
     commons.make_deterministic(args.seed)
@@ -126,6 +135,9 @@ def train():
         frontal_loss = torchmetrics.MeanMetric()
 
         model = model.train()
+        if args.wandb:
+            wandb.watch(model)
+
         for iteration in tqdm(range(args.iterations_per_epoch), ncols=100):
             model_optimizer.zero_grad()
 
@@ -166,12 +178,19 @@ def train():
                       f"group {current_dataset_num + 1} frontal_loss = {frontal_loss.compute():.4f}")
 
         #### Evaluation
-        recalls, recalls_str = test.test(args, val_ds, model, batchify=True)
+        recalls, recalls_str = test.test(args, val_ds, model, batchify=True, resize=args.image_size_dimension or None)
         logging.info(f"Epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, {val_ds}: {recalls_str}")
+
+        if args.wandb:
+            wandb.log({
+                'Validation_Lateral_Loss': lateral_loss.compute(),
+                'Validation_Frontal_Loss': frontal_loss.compute(),
+                'Validation_Recall@1': recalls[0]
+            })
         is_best = recalls[0] > best_val_recall1
         best_val_recall1 = max(recalls[0], best_val_recall1)
         # Save checkpoint, which contains all training parameters
-        util.save_checkpoint({
+        checkpoint, best_model_path = util.save_checkpoint({
             "epoch_num": epoch_num + 1,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": model_optimizer.state_dict(),
@@ -179,6 +198,11 @@ def train():
             "optimizers_state_dict": [c.state_dict() for c in classifiers_optimizers],
             "best_val_recall1": best_val_recall1
         }, is_best, output_folder)
+        if args.wandb:
+            log_model_to_wandb(checkpoint, name=f"model_epoch_{epoch_num + 1}")
+            if best_model_path:
+                log_model_to_wandb(best_model_path, name=f"best_model_epoch_{epoch_num + 1}")
+
 
     logging.info(f"Trained for {epoch_num + 1:02d} epochs, in total in {str(datetime.now() - start_time)[:-7]}")
 
@@ -189,6 +213,15 @@ def train():
     test_ds = TestDataset(f"{args.test_dataset_folder}")
     recalls, recalls_str = test.test(args, test_ds, model)
     logging.info(f"{test_ds}: {recalls_str}")
+    if args.wandb:
+        wandb.log({
+            'Test_Recall@1': recalls[0]
+        })
+
+        logging.info("Experiment finished (without any errors)")
+
+        # 3. Close wandb
+        wandb.finish()
 
     logging.info("Experiment finished (without any errors)")
 

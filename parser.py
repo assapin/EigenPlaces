@@ -14,6 +14,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--run_on_sm", type=bool, default=False,
                         help="Is this job running on sagemaker")
+    parser.add_argument("--wandb", type=str, default=None,
+                        help="name of wandb project to use")
     # CosPlace Groups parameters
     parser.add_argument("--M", type=int, default=15, help="_")
     parser.add_argument("--N", type=int, default=3, help="_")
