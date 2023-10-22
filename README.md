@@ -56,8 +56,8 @@ model = torch.hub.load("gmberton/eigenplaces", "get_trained_model", backbone="Re
 --backbone dinov2_vitb14 \
 --image_size_dimension 224 \
 --batch_size 48 \
---epochs_num 5 \ 
---iterations_per_epoch 10000 \
+--epochs_num 1 \ 
+--iterations_per_epoch 300 
 
 ```
 

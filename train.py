@@ -22,7 +22,7 @@ import wandb
 def log_model_to_wandb(local_path, name):
     artifact = wandb.Artifact(name, type='model', description='trained model')
     artifact.add_file(local_path)
-    wandb.log({name: artifact})
+    wandb.log_artifact(artifact)
 
 def train():
 
@@ -89,7 +89,7 @@ def train():
                  f"with batch_size {args.batch_size}, therefore the model sees each class (on average) " +
                  f"{args.iterations_per_epoch * args.batch_size / len(groups[0]):.1f} times per epoch")
 
-    val_ds = TestDataset(f"{args.val_dataset_folder}")
+    val_ds = TestDataset(f"{args.val_dataset_folder}", queries_folder="queries")
     logging.info(f"Validation set: {val_ds}")
 
     #### Resume
@@ -210,7 +210,7 @@ def train():
     best_model_state_dict = torch.load(f"{output_folder}/best_model.pth")
     model.load_state_dict(best_model_state_dict)
 
-    test_ds = TestDataset(f"{args.test_dataset_folder}")
+    test_ds = TestDataset(f"{args.test_dataset_folder}", queries_folder="queries_v1")
     recalls, recalls_str = test.test(args, test_ds, model)
     logging.info(f"{test_ds}: {recalls_str}")
     if args.wandb:
