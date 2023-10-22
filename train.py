@@ -211,7 +211,7 @@ def train():
     model.load_state_dict(best_model_state_dict)
 
     test_ds = TestDataset(f"{args.test_dataset_folder}", queries_folder="queries_v1")
-    recalls, recalls_str = test.test(args, test_ds, model)
+    recalls, recalls_str = test.test(args=args, eval_ds=test_ds, model=model, resize=args.image_size_dimension)
     logging.info(f"{test_ds}: {recalls_str}")
     if args.wandb:
         wandb.log({

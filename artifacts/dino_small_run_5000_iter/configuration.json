@@ -1,0 +1,186 @@
+{
+  "M": {
+    "desc": null,
+    "value": 15
+  },
+  "N": {
+    "desc": null,
+    "value": 3
+  },
+  "m": {
+    "desc": null,
+    "value": 0.4
+  },
+  "s": {
+    "desc": null,
+    "value": 100
+  },
+  "lr": {
+    "desc": null,
+    "value": 0.00001
+  },
+  "hue": {
+    "desc": null,
+    "value": 0.5
+  },
+  "seed": {
+    "desc": null,
+    "value": 0
+  },
+  "wandb": {
+    "desc": null,
+    "value": "fingerpic"
+  },
+  "_wandb": {
+    "desc": null,
+    "value": {
+      "t": {
+        "1": [
+          1,
+          5,
+          41,
+          51,
+          53,
+          55
+        ],
+        "2": [
+          1,
+          5,
+          41,
+          51,
+          53,
+          55
+        ],
+        "3": [
+          1,
+          16,
+          23
+        ],
+        "4": "3.10.9",
+        "5": "0.15.12",
+        "8": [
+          5
+        ],
+        "13": "linux-x86_64"
+      },
+      "framework": "torch",
+      "start_time": 1697976801.150073,
+      "cli_version": "0.15.12",
+      "is_jupyter_run": false,
+      "python_version": "3.10.9",
+      "is_kaggle_kernel": false
+    }
+  },
+  "device": {
+    "desc": null,
+    "value": "cuda"
+  },
+  "backbone": {
+    "desc": null,
+    "value": "dinov2_vitb14"
+  },
+  "contrast": {
+    "desc": null,
+    "value": 0.7
+  },
+  "save_dir": {
+    "desc": null,
+    "value": "default"
+  },
+  "run_on_sm": {
+    "desc": null,
+    "value": false
+  },
+  "batch_size": {
+    "desc": null,
+    "value": 32
+  },
+  "brightness": {
+    "desc": null,
+    "value": 0.7
+  },
+  "epochs_num": {
+    "desc": null,
+    "value": 10
+  },
+  "focal_dist": {
+    "desc": null,
+    "value": 10
+  },
+  "groups_num": {
+    "desc": null,
+    "value": 9
+  },
+  "lambda_lat": {
+    "desc": null,
+    "value": 1
+  },
+  "saturation": {
+    "desc": null,
+    "value": 0.7
+  },
+  "num_workers": {
+    "desc": null,
+    "value": 8
+  },
+  "lambda_front": {
+    "desc": null,
+    "value": 1
+  },
+  "resume_model": {
+    "desc": null,
+    "value": null
+  },
+  "resume_train": {
+    "desc": null,
+    "value": null
+  },
+  "fc_output_dim": {
+    "desc": null,
+    "value": 512
+  },
+  "classifiers_lr": {
+    "desc": null,
+    "value": 0.01
+  },
+  "infer_batch_size": {
+    "desc": null,
+    "value": 16
+  },
+  "visualize_classes": {
+    "desc": null,
+    "value": 0
+  },
+  "val_dataset_folder": {
+    "desc": null,
+    "value": "/home/ec2-user/fingerpic/data/processed/val"
+  },
+  "random_resized_crop": {
+    "desc": null,
+    "value": 0.5
+  },
+  "test_dataset_folder": {
+    "desc": null,
+    "value": "/home/ec2-user/fingerpic/data/processed/test"
+  },
+  "image_size_dimension": {
+    "desc": null,
+    "value": 224
+  },
+  "iterations_per_epoch": {
+    "desc": null,
+    "value": 5000
+  },
+  "min_images_per_class": {
+    "desc": null,
+    "value": 5
+  },
+  "train_dataset_folder": {
+    "desc": null,
+    "value": "/home/ec2-user/fingerpic/data/processed/train"
+  },
+  "positive_dist_threshold": {
+    "desc": null,
+    "value": 25
+  }
+}

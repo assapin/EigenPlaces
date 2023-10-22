@@ -50,14 +50,15 @@ model = torch.hub.load("gmberton/eigenplaces", "get_trained_model", backbone="Re
 
 ```
 --device cuda \
---train_dataset_folder /Users/assaf/projects/fingerpic/data/small/train \
---test_dataset_folder /Users/assaf/projects/fingerpic/data/small/test \
---val_dataset_folder /Users/assaf/projects/fingerpic/data/small/val \
+--train_dataset_folder $HOME/fingerpic/data/processed/train \
+--test_dataset_folder $HOME/fingerpic/data/processed/test \
+--val_dataset_folder $HOME/fingerpic/data/processed/val \
 --backbone dinov2_vitb14 \
 --image_size_dimension 224 \
---batch_size 48 \
---epochs_num 1 \ 
---iterations_per_epoch 300 
+--batch_size 432 \
+--epochs_num 10 \ 
+--iterations_per_epoch 5000 \
+--wandb fingerpic 
 
 ```
 
